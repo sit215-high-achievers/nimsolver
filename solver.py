@@ -19,25 +19,34 @@ def check_win(list, misere, computer):
 
 def get_computer_move(list):
 	print_board(list)
-	print(group_nimsum(list))
-	if group_nimsum(list) == 0:
+	if (group_nimsum(list) == 0 and not misere) or (group_nimsum(list) == 0 and misere and all(list[i] > 1 for i in range(len(list)))) or (group_nimsum(list) == 1 and misere and all(list[i] <= 1 for i in range(len(list)))):
 		# Computer will lose unless user makes mistake
 		count = 0
 		while count < len(list):
 			if list[count] > 0:
 				list[count] = 0
-				break
+				return list
 			count += 1
 	else:
 		individual_nimsums = [list[i] ^ group_nimsum(list) for i in range(len(list))]
 		count = 0
 		while count < len(list):
 			print(str(count) + ": " + str(individual_nimsums[count]) + " " + str(list[count]))
-			if individual_nimsums[count] < list[count]:
-				list[count] = individual_nimsums[count]
-				break
+			newlist = list.copy()
+			newlist[count] = individual_nimsums[count]
+			if misere and all(newlist[i] <= 1 for i in range(len(newlist))) and sum(newlist) % 2 == 0:
+				counter2 = 0
+				while counter2 < len(newlist):
+					if sum(newlist) == 0 and list[counter2] > 1:
+						newlist[counter2] = 1
+						return newlist
+					elif counter2 > 0:
+						newlist[counter2] = 0
+						return newlist
+					counter2 += 1
+			elif individual_nimsums[count] < list[count]:
+				return newlist
 			count += 1
-	return list
 
 def get_user_move(list):
 	# Print the current board
@@ -88,7 +97,7 @@ def print_board(list):
 numpiles = random.randint(2,5)
 
 # Change this to run in misere mode
-misere = False
+misere = True
 
 # This is a minimum number of pieces as per the specification
 # You can experiment with increasing it.
